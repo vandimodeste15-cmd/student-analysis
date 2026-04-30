@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyAI — Student Performance Analyzer</title>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+  <link rel="stylesheet" href="/css/custom.css" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <span class="brand-icon">📊</span>
+      <span class="fw-bold">StudyAI</span>
+    </a>
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="#how-it-works">
+          <i class="bi bi-info-circle me-1"></i>How It Works
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#features">
+          <i class="bi bi-stars me-1"></i>Features
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center min-vh-75">
+      <div class="col-lg-6">
+        <div class="badge badge-pill mb-3">
+          <i class="bi bi-stars me-1"></i> AI-Powered Academic Insights
+        </div>
+        <h1 class="display-4 fw-bold mb-4">
+          Understand What Drives Your
+          <span class="text-gradient"> Academic Performance</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+          Input your daily habits — study hours, sleep, social media usage, and attendance —
+          and let our machine-learning engine reveal patterns, predict grades, and classify
+          your performance profile.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="#how-it-works" class="btn btn-primary btn-lg px-4">
+            <i class="bi bi-rocket me-2"></i>Learn More
+          </a>
+          <a href="#features" class="btn btn-outline-light btn-lg px-4">
+            <i class="bi bi-bar-chart-line me-2"></i>See Features
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+        <div class="hero-illustration">
+          <div class="stat-card-float stat-card-1">
+            <i class="bi bi-graph-up-arrow text-success fs-4"></i>
+            <div>
+              <div class="fw-bold">Grade Prediction</div>
+              <div class="text-muted small">ML-powered forecast</div>
+            </div>
+          </div>
+          <div class="hero-circle">
+            <span class="hero-emoji">🎓</span>
+          </div>
+          <div class="stat-card-float stat-card-2">
+            <i class="bi bi-people-fill text-primary fs-4"></i>
+            <div>
+              <div class="fw-bold">Insights</div>
+              <div class="text-muted small">data-driven analysis</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how-it-works" class="section-alt py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">How It Works</h2>
+      <p class="text-muted">Three simple steps to unlock your academic insights</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 text-center">
+        <div class="step-icon mx-auto mb-3">1</div>
+        <h5 class="fw-semibold">Submit Your Data</h5>
+        <p class="text-muted small">
+          Fill in a quick form about your study habits, sleep patterns,
+          social media usage, attendance, and past grade.
+        </p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="step-icon mx-auto mb-3">2</div>
+        <h5 class="fw-semibold">AI Analyzes Patterns</h5>
+        <p class="text-muted small">
+          Our engine runs Linear Regression, PCA, K-Nearest Neighbour
+          classification, and K-Means clustering on the growing dataset.
+        </p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="step-icon mx-auto mb-3">3</div>
+        <h5 class="fw-semibold">Get Visual Insights</h5>
+        <p class="text-muted small">
+          Explore interactive charts, grade predictions, cluster maps,
+          and actionable insights on the live dashboard.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Analytics Features</h2>
+      <p class="text-muted">Everything powered by Python's scientific stack</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card h-100 p-4">
+          <div class="feature-icon text-primary mb-3"><i class="bi bi-graph-up fs-3"></i></div>
+          <h6 class="fw-bold mb-2">Simple Linear Regression</h6>
+          <p class="text-muted small mb-0">Predict grades from study hours alone. See the regression line live on a scatter plot.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card h-100 p-4">
+          <div class="feature-icon text-success mb-3"><i class="bi bi-layers fs-3"></i></div>
+          <h6 class="fw-bold mb-2">Multiple Linear Regression</h6>
+          <p class="text-muted small mb-0">Factor in sleep, social media, and attendance for a richer, more accurate grade forecast.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card h-100 p-4">
+          <div class="feature-icon text-info mb-3"><i class="bi bi-diagram-3 fs-3"></i></div>
+          <h6 class="fw-bold mb-2">PCA Dimensionality Reduction</h6>
+          <p class="text-muted small mb-0">Visualize 4-dimensional student data compressed into 2D space using Principal Component Analysis.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card h-100 p-4">
+          <div class="feature-icon text-warning mb-3"><i class="bi bi-person-badge fs-3"></i></div>
+          <h6 class="fw-bold mb-2">Performance Classification</h6>
+          <p class="text-muted small mb-0">KNN classifier labels each student as High Performer, Average, or Low Performer.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card h-100 p-4">
+          <div class="feature-icon text-danger mb-3"><i class="bi bi-grid-3x3-gap fs-3"></i></div>
+          <h6 class="fw-bold mb-2">K-Means Clustering</h6>
+          <p class="text-muted small mb-0">Discover natural student groups with unsupervised clustering and silhouette scoring.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card h-100 p-4">
+          <div class="feature-icon text-secondary mb-3"><i class="bi bi-download fs-3"></i></div>
+          <h6 class="fw-bold mb-2">CSV Export</h6>
+          <p class="text-muted small mb-0">Download your own data or, as admin, the complete dataset — one click.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt py-5">
+  <div class="container text-center">
+    <h3 class="fw-bold mb-3">Want to run the full application?</h3>
+    <p class="text-muted mb-4 mx-auto" style="max-width: 640px;">
+      StudyAI is built with Flask, SQLAlchemy, and scikit-learn. The interactive
+      dashboard, data submission, and ML predictions require a Python runtime,
+      so the app itself is hosted on a Python-friendly platform such as Render,
+      Railway, or Heroku. This page is the public landing site.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer mt-auto py-4">
+  <div class="container text-center">
+    <p class="mb-1 text-muted small">
+      <strong>StudyAI</strong> — Student Performance &amp; Lifestyle Analyzer
+    </p>
+    <p class="text-muted small mb-0">
+      Powered by Python · Flask · scikit-learn · pandas
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
