@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — StudyAI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="bi bi-bar-chart-line text-primary me-2"></i>Analytics Dashboard
+      </h2>
+      <p class="text-muted mb-0">Real-time insights from all student submissions</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('main.collect') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>Add Data
+      </a>
+      <a href="{{ url_for('dashboard.export_csv') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-download me-1"></i>Export CSV
+      </a>
+    </div>
+  </div>
+
+  {% if not analysis.enough_data %}
+  <!-- Not enough data -->
+  <div class="row justify-content-center">
+    <div class="col-lg-6 text-center py-5">
+      <div class="empty-state-icon mb-4">📉</div>
+      <h4 class="fw-bold mb-2">Not Enough Data Yet</h4>
+      <p class="text-muted mb-4">
+        The dashboard needs at least <strong>{{ analysis.min_rows }} entries</strong>
+        to run analysis. Currently: <strong>{{ analysis.count }}</strong> submitted.
+      </p>
+      <a href="{{ url_for('main.collect') }}" class="btn btn-primary px-4">
+        <i class="bi bi-pencil-square me-2"></i>Submit Your Data
+      </a>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- ── KPI Cards ──────────────────────────────────────────────────────── -->
+  {% set s = analysis.stats %}
+  <div class="row g-3 mb-4">
+    {% set kpis = [
+      ("bi-people-fill",  "primary",  "Total Entries",     s.total,           ""),
+      ("bi-award-fill",   "success",  "Avg Grade",         s.avg_grade,       "%"),
+      ("bi-book-fill",    "info",     "Avg Study",         s.avg_study,       " hrs"),
+      ("bi-moon-fill",    "warning",  "Avg Sleep",         s.avg_sleep,       " hrs"),
+      ("bi-phone-fill",   "danger",   "Avg Social Media",  s.avg_social,      " hrs"),
+      ("bi-calendar2-check-fill", "secondary", "Avg Attendance", s.avg_attendance, "%"),
+    ] %}
+    {% for icon, color, label, value, unit in kpis %}
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="kpi-card h-100 p-3 text-center">
+        <i class="bi {{ icon }} fs-3 text-{{ color }} mb-2 d-block"></i>
+        <div class="kpi-value">{{ value }}{{ unit }}</div>
+        <div class="kpi-label">{{ label }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if analysis.insight_threshold %}
+  <!-- Insight banner -->
+  <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-lightbulb-fill fs-5"></i>
+    <span>
+      <strong>Insight:</strong> Students who study at least
+      <strong>{{ analysis.insight_threshold }} hours per day</strong>
+      tend to achieve grades of <strong>70%+</strong> on average.
+    </span>
+  </div>
+  {% endif %}
+
+  <!-- ── Charts Row 1 ─────────────────────────────────────────────────── -->
+  <div class="row g-4 mb-4">
+
+    <!-- Correlation Heatmap -->
+    {% if analysis.heatmap %}
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-grid-3x3 text-primary me-2"></i>Correlation Heatmap
+        </div>
+        <div class="chart-card-body text-center">
+          <img src="data:image/png;base64,{{ analysis.heatmap }}"
+               class="img-fluid chart-img" alt="Correlation Heatmap" />
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Study → Grade Trend -->
+    {% if analysis.trend %}
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-bar-chart text-success me-2"></i>Grade vs Study Hours (Trend)
+        </div>
+        <div class="chart-card-body text-center">
+          <img src="data:image/png;base64,{{ analysis.trend }}"
+               class="img-fluid chart-img" alt="Study-Grade Trend" />
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ── Charts Row 2: Regression ────────────────────────────────────── -->
+  <div class="row g-4 mb-4">
+
+    <!-- Simple Linear Regression -->
+    {% if analysis.slr.available %}
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-graph-up text-info me-2"></i>
+          A — Simple Linear Regression
+          <span class="badge bg-info ms-2">R² = {{ analysis.slr.r2 }}</span>
+        </div>
+        <div class="chart-card-body">
+          <img src="data:image/png;base64,{{ analysis.slr.chart }}"
+               class="img-fluid chart-img" alt="Simple Linear Regression" />
+          <div class="chart-equation mt-2">
+            <code>{{ analysis.slr.equation }}</code>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Multiple Linear Regression -->
+    {% if analysis.mlr.available %}
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-layers text-warning me-2"></i>
+          B — Multiple Linear Regression
+          <span class="badge bg-warning text-dark ms-2">R² = {{ analysis.mlr.r2 }}</span>
+        </div>
+        <div class="chart-card-body">
+          <img src="data:image/png;base64,{{ analysis.mlr.chart }}"
+               class="img-fluid chart-img" alt="Multiple Linear Regression" />
+          <div class="mt-2">
+            {% for feat, coef in analysis.mlr.coefficients.items() %}
+            <span class="badge {{ 'bg-success' if coef >= 0 else 'bg-danger' }} me-1 mb-1">
+              {{ feat }}: {{ coef }}
+            </span>
+            {% endfor %}
+            <span class="badge bg-secondary">intercept: {{ analysis.mlr.intercept }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ── Charts Row 3: PCA + Classification ──────────────────────────── -->
+  <div class="row g-4 mb-4">
+
+    <!-- PCA -->
+    {% if analysis.pca.available %}
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-diagram-3 text-primary me-2"></i>
+          C — PCA Dimensionality Reduction
+        </div>
+        <div class="chart-card-body">
+          <img src="data:image/png;base64,{{ analysis.pca.chart }}"
+               class="img-fluid chart-img" alt="PCA" />
+          <div class="mt-2 small text-muted">
+            Explained variance per component:
+            {% for v in analysis.pca.explained_variance %}
+            <span class="badge bg-dark me-1">PC{{ loop.index }}: {{ v }}%</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Classification -->
+    {% if analysis.classification.available %}
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-person-badge text-success me-2"></i>
+          D — Performance Classification
+          {% if analysis.classification.accuracy %}
+          <span class="badge bg-success ms-2">
+            KNN Acc: {{ analysis.classification.accuracy }}%
+          </span>
+          {% endif %}
+        </div>
+        <div class="chart-card-body">
+          <img src="data:image/png;base64,{{ analysis.classification.chart }}"
+               class="img-fluid chart-img" alt="Classification" />
+          <div class="mt-2">
+            {% for label, count in analysis.classification.distribution.items() %}
+            <span class="badge me-1
+              {{ 'bg-success' if label == 'High Performer' else
+                 'bg-warning text-dark' if label == 'Average' else 'bg-danger' }}">
+              {{ label }}: {{ count }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ── Charts Row 4: K-Means ────────────────────────────────────────── -->
+  {% if analysis.clustering.available %}
+  <div class="row g-4 mb-4">
+    <div class="col-12">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-grid-3x3-gap text-danger me-2"></i>
+          E — K-Means Clustering
+          <span class="badge bg-danger ms-2">
+            Silhouette: {{ analysis.clustering.silhouette }}
+          </span>
+        </div>
+        <div class="chart-card-body text-center">
+          <img src="data:image/png;base64,{{ analysis.clustering.chart }}"
+               class="img-fluid chart-img" alt="K-Means Clustering" />
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Recent Submissions (mine) ────────────────────────────────────── -->
+  {% if my_entries %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="chart-card">
+        <div class="chart-card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-clock-history text-secondary me-2"></i>My Recent Submissions</span>
+          <a href="{{ url_for('dashboard.my_data') }}" class="btn btn-sm btn-outline-secondary">
+            View All
+          </a>
+        </div>
+        <div class="chart-card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Study hrs</th>
+                  <th>Sleep hrs</th>
+                  <th>Attendance</th>
+                  <th>Grade</th>
+                  <th>Predicted</th>
+                  <th>Label</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in my_entries %}
+                <tr>
+                  <td class="text-muted small">{{ e.created_at.strftime('%b %d, %H:%M') }}</td>
+                  <td>{{ e.study_hours }}h</td>
+                  <td>{{ e.sleep_hours }}h</td>
+                  <td>{{ e.attendance_rate }}%</td>
+                  <td><strong>{{ e.previous_grade }}</strong></td>
+                  <td>{{ '%.1f'|format(e.predicted_grade) if e.predicted_grade else '—' }}</td>
+                  <td>
+                    {% if e.performance_label %}
+                    <span class="badge
+                      {{ 'bg-success' if e.performance_label == 'High Performer' else
+                         'bg-warning text-dark' if e.performance_label == 'Average' else 'bg-danger' }}">
+                      {{ e.performance_label }}
+                    </span>
+                    {% else %}—{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% endif %} {# end enough_data #}
+</div>
+{% endblock %}

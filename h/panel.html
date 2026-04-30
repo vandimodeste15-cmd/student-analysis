@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel — StudyAI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="bi bi-shield-lock text-warning me-2"></i>Admin Panel
+      </h2>
+      <p class="text-muted mb-0">System overview and data management</p>
+    </div>
+    <a href="{{ url_for('admin.export_all_csv') }}" class="btn btn-warning btn-sm">
+      <i class="bi bi-download me-1"></i>Export All Data (CSV)
+    </a>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="kpi-card p-4 text-center">
+        <i class="bi bi-people-fill fs-2 text-primary mb-2 d-block"></i>
+        <div class="kpi-value">{{ stats.total_users }}</div>
+        <div class="kpi-label">Registered Users</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="kpi-card p-4 text-center">
+        <i class="bi bi-database-fill fs-2 text-success mb-2 d-block"></i>
+        <div class="kpi-value">{{ stats.total_entries }}</div>
+        <div class="kpi-label">Total Entries</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="kpi-card p-4 text-center">
+        <i class="bi bi-shield-fill fs-2 text-warning mb-2 d-block"></i>
+        <div class="kpi-value">{{ stats.admin_count }}</div>
+        <div class="kpi-label">Admin Users</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Users table -->
+    <div class="col-lg-5">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-people text-primary me-2"></i>Users
+        </div>
+        <div class="chart-card-body p-0">
+          <table class="table table-sm table-hover mb-0">
+            <thead>
+              <tr><th>User</th><th>Email</th><th>Role</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr>
+                <td>
+                  <strong>{{ user.username }}</strong>
+                  {% if user.id == current_user.id %}
+                  <span class="badge bg-secondary ms-1">you</span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted">{{ user.email }}</td>
+                <td>
+                  <span class="badge {{ 'bg-warning text-dark' if user.is_admin else 'bg-secondary' }}">
+                    {{ 'Admin' if user.is_admin else 'User' }}
+                  </span>
+                </td>
+                <td>
+                  {% if user.id != current_user.id %}
+                  <form method="POST"
+                        action="{{ url_for('admin.toggle_admin', user_id=user.id) }}"
+                        class="d-inline">
+                    <button type="submit" class="btn btn-xs
+                      {{ 'btn-outline-danger' if user.is_admin else 'btn-outline-warning' }}"
+                      onclick="return confirm('Change role for {{ user.username }}?')">
+                      {{ 'Revoke Admin' if user.is_admin else 'Make Admin' }}
+                    </button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent entries table -->
+    <div class="col-lg-7">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <i class="bi bi-database text-success me-2"></i>Recent Entries (latest 50)
+        </div>
+        <div class="chart-card-body p-0">
+          <div class="table-responsive" style="max-height:400px;overflow-y:auto">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="sticky-top">
+                <tr>
+                  <th>ID</th><th>User</th><th>Study</th><th>Sleep</th>
+                  <th>Grade</th><th>Label</th><th>Date</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in entries %}
+                <tr>
+                  <td class="text-muted">{{ e.id }}</td>
+                  <td>{{ e.user.username if e.user else '—' }}</td>
+                  <td>{{ e.study_hours }}h</td>
+                  <td>{{ e.sleep_hours }}h</td>
+                  <td><strong>{{ e.previous_grade }}</strong></td>
+                  <td>
+                    {% if e.performance_label %}
+                    <span class="badge badge-sm
+                      {{ 'bg-success' if e.performance_label == 'High Performer' else
+                         'bg-warning text-dark' if e.performance_label == 'Average' else 'bg-danger' }}">
+                      {{ e.performance_label[:4] }}
+                    </span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small">{{ e.created_at.strftime('%m/%d %H:%M') }}</td>
+                  <td>
+                    <form method="POST"
+                          action="{{ url_for('admin.delete_entry', entry_id=e.id) }}"
+                          class="d-inline">
+                      <button type="submit" class="btn btn-xs btn-outline-danger"
+                        onclick="return confirm('Delete entry #{{ e.id }}?')">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis summary if enough data -->
+  {% if analysis.enough_data %}
+  <div class="row g-4 mt-2">
+    {% if analysis.classification.chart %}
+    <div class="col-md-6">
+      <div class="chart-card">
+        <div class="chart-card-header">Performance Distribution</div>
+        <div class="chart-card-body text-center">
+          <img src="data:image/png;base64,{{ analysis.classification.chart }}"
+               class="img-fluid" style="max-height:250px" />
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if analysis.clustering.chart %}
+    <div class="col-md-6">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          K-Means Clusters (Silhouette: {{ analysis.clustering.silhouette }})
+        </div>
+        <div class="chart-card-body text-center">
+          <img src="data:image/png;base64,{{ analysis.clustering.chart }}"
+               class="img-fluid" style="max-height:250px" />
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

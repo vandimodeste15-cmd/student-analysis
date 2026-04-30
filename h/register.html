@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Register — StudyAI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="text-center mb-4">
+        <div class="auth-logo mb-3">🎓</div>
+        <h3 class="fw-bold">Create Your Account</h3>
+        <p class="text-muted small">Start analyzing your academic performance today</p>
+      </div>
+
+      <div class="card form-card">
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('auth.register') }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="username">Username</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="username" name="username"
+                       required autofocus minlength="3" maxlength="64"
+                       placeholder="choose_a_username"
+                       value="{{ form_data.get('username', '') }}" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="email">Email</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email"
+                       required placeholder="you@example.com"
+                       value="{{ form_data.get('email', '') }}" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="password">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password"
+                       required minlength="6" placeholder="min. 6 characters" />
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-semibold" for="confirm_password">Confirm Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                <input type="password" class="form-control" id="confirm_password"
+                       name="confirm_password" required placeholder="repeat password" />
+              </div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-person-plus me-2"></i>Create Account
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <p class="text-center text-muted mt-3 small">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}" class="text-primary">Login</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

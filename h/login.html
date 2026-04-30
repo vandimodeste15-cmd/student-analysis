@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Login — StudyAI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+      <div class="text-center mb-4">
+        <div class="auth-logo mb-3">📊</div>
+        <h3 class="fw-bold">Welcome Back</h3>
+        <p class="text-muted small">Sign in to your StudyAI account</p>
+      </div>
+
+      <div class="card form-card">
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="username">Username</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="username" name="username"
+                       required autofocus placeholder="your_username" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="password">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password"
+                       required placeholder="••••••••" />
+              </div>
+            </div>
+            <div class="mb-4 form-check">
+              <input type="checkbox" class="form-check-input" id="remember" name="remember" />
+              <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <p class="text-center text-muted mt-3 small">
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}" class="text-primary">Register here</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

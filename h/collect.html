@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Submit Data — StudyAI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Page header -->
+      <div class="mb-5">
+        <h2 class="fw-bold mb-1">
+          <i class="bi bi-pencil-square text-primary me-2"></i>Submit Your Data
+        </h2>
+        <p class="text-muted">
+          Fill in your daily habits and academic information. All fields (except Name) are required.
+        </p>
+      </div>
+
+      <!-- Live prediction badge -->
+      <div id="livePrediction" class="alert alert-info d-none mb-4" role="alert">
+        <i class="bi bi-cpu me-2"></i>
+        <strong>Live Prediction:</strong>
+        Predicted grade — <span id="predGrade" class="fw-bold fs-5">—</span>
+        &nbsp;·&nbsp; <span id="predLabel" class="badge bg-secondary"></span>
+      </div>
+
+      <!-- Form card -->
+      <div class="card form-card">
+        <div class="card-body p-4 p-md-5">
+          <form method="POST" action="{{ url_for('main.collect') }}" id="dataForm" novalidate>
+
+            <!-- Name (optional) -->
+            <div class="mb-4">
+              <label for="name" class="form-label fw-semibold">
+                Name <span class="text-muted fw-normal">(optional)</span>
+              </label>
+              <input type="text" class="form-control" id="name" name="name"
+                     placeholder="e.g. Alice"
+                     value="{{ form_data.get('name', '') }}" maxlength="100" />
+            </div>
+
+            <hr class="my-4" />
+            <h6 class="text-uppercase text-muted mb-3 small letter-spacing">Daily Habits</h6>
+
+            <div class="row g-3 mb-4">
+              <!-- Study hours -->
+              <div class="col-md-6">
+                <label for="study_hours" class="form-label fw-semibold">
+                  <i class="bi bi-book text-primary me-1"></i> Study Hours / Day
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control live-field"
+                         id="study_hours" name="study_hours"
+                         min="0" max="24" step="0.5" required
+                         placeholder="e.g. 4"
+                         value="{{ form_data.get('study_hours', '') }}" />
+                  <span class="input-group-text">hrs</span>
+                </div>
+                <div class="form-text">Hours spent studying per day (0–24)</div>
+              </div>
+
+              <!-- Sleep hours -->
+              <div class="col-md-6">
+                <label for="sleep_hours" class="form-label fw-semibold">
+                  <i class="bi bi-moon-stars text-info me-1"></i> Sleep Hours / Night
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control live-field"
+                         id="sleep_hours" name="sleep_hours"
+                         min="0" max="24" step="0.5" required
+                         placeholder="e.g. 7"
+                         value="{{ form_data.get('sleep_hours', '') }}" />
+                  <span class="input-group-text">hrs</span>
+                </div>
+              </div>
+
+              <!-- Social media -->
+              <div class="col-md-6">
+                <label for="social_media_hours" class="form-label fw-semibold">
+                  <i class="bi bi-phone text-warning me-1"></i> Social Media / Day
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control live-field"
+                         id="social_media_hours" name="social_media_hours"
+                         min="0" max="24" step="0.5" required
+                         placeholder="e.g. 2"
+                         value="{{ form_data.get('social_media_hours', '') }}" />
+                  <span class="input-group-text">hrs</span>
+                </div>
+              </div>
+
+              <!-- Attendance -->
+              <div class="col-md-6">
+                <label for="attendance_rate" class="form-label fw-semibold">
+                  <i class="bi bi-calendar-check text-success me-1"></i> Attendance Rate
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control live-field"
+                         id="attendance_rate" name="attendance_rate"
+                         min="0" max="100" step="1" required
+                         placeholder="e.g. 85"
+                         value="{{ form_data.get('attendance_rate', '') }}" />
+                  <span class="input-group-text">%</span>
+                </div>
+                <div class="form-text">Percentage of classes attended (0–100)</div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <h6 class="text-uppercase text-muted mb-3 small letter-spacing">Academic Record</h6>
+
+            <div class="mb-4">
+              <label for="previous_grade" class="form-label fw-semibold">
+                <i class="bi bi-award text-danger me-1"></i> Previous Grade
+              </label>
+              <div class="row align-items-center">
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <input type="number" class="form-control"
+                           id="previous_grade" name="previous_grade"
+                           min="0" max="100" step="0.1" required
+                           placeholder="e.g. 72"
+                           value="{{ form_data.get('previous_grade', '') }}" />
+                    <span class="input-group-text">/ 100</span>
+                  </div>
+                </div>
+                <div class="col-sm-6 mt-2 mt-sm-0">
+                  <div id="gradeGauge" class="grade-gauge-wrapper">
+                    <div class="grade-gauge-bar">
+                      <div id="gradeBar" class="grade-gauge-fill"></div>
+                    </div>
+                    <small id="gradeLabel" class="text-muted ms-2">—</small>
+                  </div>
+                </div>
+              </div>
+              <div class="form-text">Your most recent exam / course grade (0–100)</div>
+            </div>
+
+            <!-- Submit -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-send me-2"></i>Submit & Analyze
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Privacy note -->
+      <p class="text-muted small text-center mt-3">
+        <i class="bi bi-shield-check me-1"></i>
+        Your data is stored securely and used only for aggregate analysis within this platform.
+      </p>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const PREDICT_URL = "{{ url_for('main.api_predict') }}";
+const liveFields = document.querySelectorAll(".live-field");
+const previousGradeInput = document.getElementById("previous_grade");
+const gradeBar   = document.getElementById("gradeBar");
+const gradeLabel = document.getElementById("gradeLabel");
+
+// Grade gauge for previous_grade
+previousGradeInput.addEventListener("input", function () {
+  const val = parseFloat(this.value);
+  if (!isNaN(val) && val >= 0 && val <= 100) {
+    gradeBar.style.width = val + "%";
+    const color = val >= 75 ? "#2ecc71" : val >= 50 ? "#f39c12" : "#e74c3c";
+    gradeBar.style.background = color;
+    gradeLabel.textContent = val >= 75 ? "High" : val >= 50 ? "Average" : "Low";
+    gradeLabel.style.color = color;
+  }
+});
+
+// Debounced live prediction
+let debounceTimer;
+function triggerPredict() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(fetchPrediction, 600);
+}
+liveFields.forEach(f => f.addEventListener("input", triggerPredict));
+
+async function fetchPrediction() {
+  const data = {
+    study_hours:        parseFloat(document.getElementById("study_hours").value),
+    sleep_hours:        parseFloat(document.getElementById("sleep_hours").value),
+    social_media_hours: parseFloat(document.getElementById("social_media_hours").value),
+    attendance_rate:    parseFloat(document.getElementById("attendance_rate").value),
+  };
+  if (Object.values(data).some(isNaN)) return;
+
+  try {
+    const resp = await fetch(PREDICT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await resp.json();
+    if (json.predicted_grade !== undefined) {
+      const el = document.getElementById("livePrediction");
+      el.classList.remove("d-none");
+      document.getElementById("predGrade").textContent = json.predicted_grade + " / 100";
+      const badge = document.getElementById("predLabel");
+      badge.textContent = json.label;
+      badge.className = "badge " + (
+        json.label === "High Performer"  ? "bg-success" :
+        json.label === "Average"         ? "bg-warning text-dark" : "bg-danger"
+      );
+    }
+  } catch (_) { /* silent fail */ }
+}
+</script>
+{% endblock %}
